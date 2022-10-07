@@ -1,3 +1,6 @@
+@TODO Have the time picker text color change to red with invalid time selection.
+
+
 10/6/2022
 
     Default security policy of the extension prevents inline scripts from running in that page. For example,

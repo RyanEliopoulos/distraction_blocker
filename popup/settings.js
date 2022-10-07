@@ -13,8 +13,7 @@ function validSettings(settingsObject) {
   if(startTimeString === '' || endTimeString === '') return false;
 
   return true;
-};
-
+}
 
 function saveSettings() {
   // Gets values from the start-time and end-time pickers. Writes them to storage.
@@ -22,18 +21,15 @@ function saveSettings() {
   let endTimePicker = document.getElementById('end-time-picker');
   let patternInputArray = document.getElementsByClassName('pattern-text-input');
   let patternStringArray = Array.prototype.map.call(patternInputArray, inputElement => ( inputElement.value ));
-
   let settingsObject = {
     startTimeString:  startTimePicker.value,
     endTimeString: endTimePicker.value,
     patternStringArray: patternStringArray
   }
-
   if(!validSettings(settingsObject)) {
     console.error(`Invalid settings`)
     return;
   }
-  // Settings are valid. Updating data store
   browser.storage.local.set({settingsObject: settingsObject})
     .then(()=> {
       console.log('successfully saved settings.')
@@ -45,13 +41,14 @@ function saveSettings() {
 
 
 function updateUI(settingsObject) {
-  // Takes the values from settings object and updates the respective UI
-  // elements.
+  /* Takes the values from settings object and updates the respective UI
+     elements.
+  */
+  // Time pickers
   let startTimePicker = document.getElementById('start-time-picker');
   startTimePicker.value = settingsObject.startTimeString
   let endTimePicker = document.getElementById('end-time-picker');
   endTimePicker.value = settingsObject.endTimeString
-
   // Instantiating the pattern list elements
   let patternListDiv = document.getElementById('pattern-list-div');
   settingsObject.patternStringArray.forEach(patternString => {
@@ -61,8 +58,9 @@ function updateUI(settingsObject) {
 }
 
 function loadSettings() {
-  // Pulls settings from storage and updates the UI
-  // Meant to be called on "boot"
+  /* Pulls settings from storage and updates the UI
+     Called on "boot"
+  */
   browser.storage.local.get("settingsObject")
     .then(results => {
       if(Object.keys(results).length === 0) return; // Returning if settings don't exist
@@ -81,27 +79,31 @@ function initBtnListeners() {
 }
 
 function deletePattern(event) {
-  // onClick callback to delete a pattern-list-item
+  // onClick callback bound to a delete-button-div
+  // to delete a pattern-list-item
   let listItemDiv = event.target.parentElement //
   listItemDiv.remove();
 }
 
 function newPattern() {
-  /* Adds a new pattern item to the pattern list div
+  /* Callback bound to the new-pattern-button
+    Adds a new pattern item to the pattern list div
     (createElement + appendChild)
   */
-
   let newListItem = buildPatternListItem('')
-  /* Attaching to DOM */
   let patternListDiv = document.getElementById('pattern-list-div');
   patternListDiv.appendChild(newListItem);
-  console.log('Pressed new pattern button');
 }
 
 function buildPatternListItem(patternString) {
   /* Returns Element (div: pattern-list-item)
+    <div class="pattern-list-item">
+      <div class="delete-button-div inline-block-div" onclick="deletePattern()">
+        X
+      </div>
+      <input type="text" class="pattern-text-input" value=patternString>
+    </div>
    */
-
   let newListItem = document.createElement("div");
   newListItem.classList.add('pattern-list-item');
   /* pattern-list-item contents */
