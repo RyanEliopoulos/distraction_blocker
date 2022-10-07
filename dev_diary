@@ -1,0 +1,55 @@
+10/6/2022
+
+    Default security policy of the extension prevents inline scripts from running in that page. For example,
+    my popup html page cannot import settings.js and use one of the functions as the onclick attribute for a button.
+    However, it does execute the javascript inside of the contained inside settings.js
+    I think the button listeners need to be added in javascript.
+
+
+    Time picker (input type="time"): Value is based on a 24-hour clock even when presenting as a 12-hour AM/PM element.
+          Value is hh:mm formatted string. Value is the empty string until all fields are filled in.
+
+10/5/2022
+
+    Target functionality:
+        Basic: User creates a list of target domains and a daily time window in which those websites are "blocked".
+               Loading one of the target domains causes the extension to present a page:
+
+                    "You don't want to visit $site right now. Your productivity window lasts another $time_remaining"
+                                        <OK>                           <Override>
+
+
+            APIs of interest
+            webRequest.onBeforeRequest: Intercept http requests.
+
+        Advanced:
+            Time rationing: Allow user to specify a daily time limit on the target websites.
+
+
+
+
+                  APIs of interest
+                  tabs.onActivated: Callback fires when the active tab in a window changes. Use to track time on site?
+                  tabs.onRemoved: Callback fires when the tab is closed. Cease time ration reduction
+                  tabs.connect: Connects background script to content scripts in a given tab. Connection-based.
+                  runtime.onMessage/runtime.sendMessage: one-off message exchange.
+
+
+
+
+
+
+
+    Background scripts: Specified in the manifest file. Can be persistent. Can also specify a background "page" rather
+                        than a script. Such a move adds supports ES modules.
+
+                        nonpersistent background scripts are unloaded after a few seconds of inactivity. Monitor this
+                        using runtime.onSuspend to install a callback, taking care of any necessary cleanup.
+
+                        Use the background code to initialize listener callbacks to events.
+
+
+                        manifest v3 Does away with persistent background pages. runtime.getBackgroundPage() returns
+                        the Window of a background page?
+
+

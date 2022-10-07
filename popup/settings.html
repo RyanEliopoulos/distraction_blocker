@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="settings.css" />
+</head>
+
+<body>
+
+<div id="popup-content">
+    <div id="pattern-div" class="inline-block-div">
+        <div id="pattern-list-div" class="pattern-list-div">
+<!--           This is where the list-item divs belong -->
+        </div>
+        <div id="pattern-button-div">
+<!--            This is where the "add pattern" button goes -->
+            <button type="button" id="new-pattern-button">New Pattern</button>
+        </div>
+
+    </div>
+    <div id="time-div" class="inline-block-div">
+        <div id="time-picker-container">
+            <div id="start-picker-container">
+                <div>
+                    <label for="start-time-picker">Start Time</label>
+                </div>
+                <div>
+                    <input type="time" id="start-time-picker">
+                </div>
+            </div>
+            <div id="end-picker-container">
+                <div>
+                    <label for="end-time-picker">End Time</label>
+                </div>
+                <div>
+                    <input type="time" id="end-time-picker">
+                </div>
+            </div>
+            <div id="save-changes-div">
+                <button type="button" id="save-changes-button">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="settings.js"></script>
+</body>
+</html>

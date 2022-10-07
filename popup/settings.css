@@ -1,0 +1,29 @@
+/*html, body {*/
+/*    height: 300px;*/
+/*}*/
+/*.popup-content {*/
+/*    height: 200px;*/
+/*}*/
+
+.inline-block-div {
+    display: inline-block;
+}
+
+.delete-button-div:hover {
+    cursor: pointer;
+}
+
+.pattern-list-div {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 125px;
+    width: 25ch;
+}
+
+.pattern-div {
+    display: inline-block;
+}
+
+.time-div {
+    display: inline-block;
+}
