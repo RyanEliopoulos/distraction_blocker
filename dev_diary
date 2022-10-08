@@ -1,4 +1,8 @@
 @TODO Have the time picker text color change to red with invalid time selection.
+@TODO Add in the time bounding functionality
+
+
+
 
 
 10/7/2022
@@ -33,6 +37,11 @@
     FINALLY a working proof of concept. The manual override button took a bit of work. Couldn't find a way to accomplish
     this without using storage.local as a "sychronous" means of communicating intent from the extension page to the
     filter. It is synchrounous in the sense that everything is stuffed in nested promise resolutions.
+
+
+    PROBLEM: Current design runs into a problem if content from target URLs is loaded into a non-blocked page.
+             The extension is only passed the URI of the offending content, causing manual override to often load
+             nothing at all.
 
 10/6/2022
 
