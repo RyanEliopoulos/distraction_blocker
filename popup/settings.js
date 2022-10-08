@@ -1,3 +1,5 @@
+
+
 function validSettings(settingsObject) {
   /*
     settingsObject:
@@ -30,13 +32,17 @@ function saveSettings() {
     console.error(`Invalid settings`)
     return;
   }
+  // Saving to disk
   browser.storage.local.set({settingsObject: settingsObject})
     .then(()=> {
-      console.log('successfully saved settings.')
+      console.log('successfully saved settings. Calling registration background script')
+      // Alerting the background filter script to update
+       browser.runtime.sendMessage({type: "settings_update", patternStringArray: patternStringArray})
     })
     .catch(error => {
       console.error(`Error writing settings to disk: ${error}`)
     })
+
 }
 
 
@@ -134,7 +140,7 @@ function buildPatternListItem(patternString) {
 
 console.log('Loading settings')
 loadSettings();
-console.error('Running initBtnlisteners');
+console.log('Running initBtnlisteners');
 initBtnListeners();
 
 
