@@ -1,7 +1,7 @@
 {
 
   "manifest_version": 2,
-  "name": "beastify",
+  "name": "distraction_blocker",
   "version": ".1",
 
   "description": "Blocks me from distracting websites (in progress)",
@@ -11,27 +11,19 @@
   },
 
   "permissions": [
-    "activeTab",
-    "storage"
+    "storage",
+    "webNavigation",
+    "tabs"
   ],
 
   "browser_action": {
     "default_icon": "icons/beasts-32.png",
-    "default_title": "Beastify",
+    "default_title": "Distraction Blocked",
     "default_popup": "popup/settings.html"
   },
 
-  "web_accessible_resources": [
-    "beasts/frogs.jpg",
-    "beasts/turtle.jpg",
-    "beasts/snake.jpg"
-  ],
-
-  "content_scripts": [
-    {
-      "matches": ["*://*.twitter.com/*", "*://*.reddit.com/*", "*://*.youtube.com/*"],
-      "js": ["distraction_blocker.js"]
-    }
-  ]
-
+  "background": {
+    "scripts": ["background_scripts/filter.js"],
+    "persistent": false
+  }
 }

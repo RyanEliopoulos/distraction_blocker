@@ -1,5 +1,50 @@
 @TODO Have the time picker text color change to red with invalid time selection.
+@TODO Add in the time bounding functionality
 
+
+
+
+
+10/7/2022
+    Firefox does not allow importing in javascript files (unless the background script is a "page").
+
+    I think this means I have to run a background page on install to register listeners. Then the popup button
+    can broadcast when the settings have changed. Then the background page/script can modify the filtering callbacks
+    as needed.  I guess the background page doens't have to be a page, I could shove everything into one file. But that
+    is kinda gross.
+
+
+    Background scripts: All background scripts are ran on install. This is how to jump start things.
+        So really each file denoted as a background script is meant to be a self-contained entity but with the ability
+        to communicate with other scripts using the communication APIs. ok ok.
+
+
+
+
+    Extension Pages:  Easy way to relay errors to the frontend. Also good for any UI unsuitable for the popup window.
+                      Maybe an "advanced" settings page for more granular control later on.  Query strings can also
+                      be used so that is cool.
+
+
+    Debugger: The extension debugger is working even if you are messing with the popup in another tab/window. Great!
+
+
+    Content scripts: Loaded programmatically, they are unregistered when the page/script from which they were registered
+                     is unloaded.
+
+
+
+    FINALLY a working proof of concept. The manual override button took a bit of work. Couldn't find a way to accomplish
+    this without using storage.local as a "sychronous" means of communicating intent from the extension page to the
+    filter. It is synchrounous in the sense that everything is stuffed in nested promise resolutions.
+
+
+    PROBLEM: Current design runs into a problem if content from target URLs is loaded into a non-blocked page.
+             The extension is only passed the URI of the offending content, causing manual override to often load
+             nothing at all.
+
+    SOLVED: webNavigation callback has details.frameId. 0 means it's top level, >0 means it is embedded. So
+            ignoring embedded frames solved the problem.
 
 10/6/2022
 
@@ -11,6 +56,13 @@
 
     Time picker (input type="time"): Value is based on a 24-hour clock even when presenting as a 12-hour AM/PM element.
           Value is hh:mm formatted string. Value is the empty string until all fields are filled in.
+
+
+    Manifest V3
+        Use of webRequest will require specifying target domains in the manifest file. So no dynamic block list
+        without specifying "<all_urls>"?
+
+
 
 10/5/2022
 
