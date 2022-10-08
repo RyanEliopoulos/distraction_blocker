@@ -45,6 +45,10 @@ async function filterActive() {
 
 function filterListener(details) {
 
+  if(details.frameId > 0) {
+    // This is an embedded frame. Ignoring.
+    return;
+  }
   console.log(`filterActive results: ${filterActive()}`)
   if(details.url.slice(0, 13) === "moz.extension") {
     // Don't want to catch the extension page in the drag net

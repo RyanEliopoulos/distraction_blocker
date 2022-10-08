@@ -43,6 +43,9 @@
              The extension is only passed the URI of the offending content, causing manual override to often load
              nothing at all.
 
+    SOLVED: webNavigation callback has details.frameId. 0 means it's top level, >0 means it is embedded. So
+            ignoring embedded frames solved the problem.
+
 10/6/2022
 
     Default security policy of the extension prevents inline scripts from running in that page. For example,
