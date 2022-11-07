@@ -1,13 +1,13 @@
 {
 
   "manifest_version": 2,
-  "name": "distraction_blocker",
+  "name": "",
   "version": ".1",
 
   "description": "Blocks me from distracting websites (in progress)",
 
   "icons": {
-    "48": "icons/border-48.png"
+    "48": "icons/hourglass.png"
   },
 
   "permissions": [
@@ -17,7 +17,7 @@
   ],
 
   "browser_action": {
-    "default_icon": "icons/beasts-32.png",
+    "default_icon": "icons/hourglass.png",
     "default_title": "Distraction Blocked",
     "default_popup": "popup/settings.html"
   },
