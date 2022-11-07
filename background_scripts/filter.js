@@ -1,24 +1,22 @@
 async function filterActive() {
   /*
-   Returns true if current system time is between start and end times
+   Returns true if current system time is between the start and end times
+   specified on the popup page
    else false
    */
 
-  // let nowTimeEpoch = Date.now();
+  // Current time details
   let dateObject = new Date();
   let currentYear = dateObject.getFullYear();
   let currentMonth = dateObject.getMonth();
   let currentDay = dateObject.getDate();
-  console.log(`This is the current day: ${currentDay}`)
 
+  // Activation window details
   let results = await browser.storage.local.get('settingsObject').catch(error => {console.error(error)})
-
-
   let startTimeString = results?.settingsObject?.startTimeString;
   let endTimeString = results?.settingsObject?.endTimeString;
   if(startTimeString === undefined || endTimeString === undefined) return;
-  console.log(startTimeString)
-  // User has set valid window times
+  // User has set valid window times. Constructing corresponding Date objects for comparison
   let startHours = parseInt(startTimeString.slice(0, 2))
   console.log(startHours)
   let startMinutes = parseInt(startTimeString.slice(3, 5))
@@ -28,29 +26,27 @@ async function filterActive() {
   let endHours = parseInt(endTimeString.slice(0, 2))
   let endMinutes = parseInt(endTimeString.slice(3, 5))
   let endTimeEpoch = new Date(currentYear, currentMonth, currentDay, endHours, endMinutes, 0)
-  console.log(`Here is the startTimeEpoch: ${startTimeEpoch}`)
-  console.log(`Here is the endTimeEpoch: ${endTimeEpoch}`)
   if(startTimeEpoch <= dateObject && dateObject <= endTimeEpoch) {
     console.log('Filter is active');
     return true;
   }
   else {
     console.log('Filter is not active');
-    console.log(dateObject)
     return false;
   }
 }
 
-
-
 function filterListener(details) {
+  // Executes when the webNavigation.onCommitted event fires with
+  // a URL matching those registered during the onUpdate call.
+  // Embedded frames originating from a filtered URL are ignored.
+  // Calls occurring outside of the specified activation times are ignored.
 
   if(details.frameId > 0) {
     // This is an embedded frame. Ignoring.
     return;
   }
-  console.log(`filterActive results: ${filterActive()}`)
-  if(details.url.slice(0, 13) === "moz.extension") {
+  if(details.url.slice(0, 13) === "moz-extension") {
     // Don't want to catch the extension page in the drag net
     // when passing the originating URL in the query string.
     console.log('extension page detected')
@@ -75,19 +71,24 @@ function filterListener(details) {
               });
           }
           else {
-            // Not exempt
-            browser.tabs.remove(details.tabId)
-            browser.tabs.create({url: `../extension_page/extension_page.html?url=${details.url}`})
+            // Not exempt. Redirecting.
+            let updateProperties = {
+              url: `../extension_page/extension_page.html?url=${details.url}`,
+              loadReplace: true  // So the back button doesn't just trigger the filter again.
+            }
+            browser.tabs.update(details.tabId, updateProperties)
             console.log('Triggered a targeted URL filter')
           }
         })
         .catch(error => {
-          console.error(`Error laoding exemptino from local storage: ${error}`)
+          console.error(`Error loading exemption from local storage: ${error}`)
         })
     })
 }
 
 function onUpdate(message, sender, sendResponse) {
+  // one-way communication from the popup when the user clicks
+  // the 'Save Changes' button or from onStartup
   console.log('in onUpdate')
   if(message.type !== "settings_update") return;
   // Adjusting webNavigation filter
@@ -101,16 +102,40 @@ function onUpdate(message, sender, sendResponse) {
   ))
   let filter = { url: urlFilterArray}
   console.log(filter)
-
   browser.webNavigation.onCommitted.addListener(filterListener, filter);
   console.log('Filters updated')
 }
 
-function onInstall() {
+function registerMsgListener() {
+  // Registers the callback listening for communication from the popup.
   if(browser.runtime.onMessage.hasListener(onUpdate)) return
   browser.runtime.onMessage.addListener(onUpdate);
 }
 
+function handleStartup() {
+  // Reads any filter patterns from persistent memory and register
+  // them with the filter.
+  console.log('Inside handleStartup')
+  browser.storage.local.get('settingsObject')
+    .then(results => {
+      if(Object.keys(results).length === 0) {
+        console.log('No stored settingsObject')
+        return;
+      }
+      console.log('loading values from settingsObject')
+      browser.runtime.sendMessage({type: 'settings_update', patternStringArray: results.patternStringArray})
+    })
+    .catch(error => {
+      console.error(`Error retrieving settingsObject in handleStartup: ${error}`)
+    })
+}
 
+function main() {
+  if(!browser.runtime.onStartup.hasListener(handleStartup)) {
+    browser.runtime.onStartup.addListener(handleStartup)
+  }
+  registerMsgListener()
+}
 
-onInstall()
+main()
+

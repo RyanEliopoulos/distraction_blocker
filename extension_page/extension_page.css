@@ -1,0 +1,16 @@
+
+
+
+.top-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.item-container {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}

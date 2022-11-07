@@ -2,6 +2,7 @@
 
 function validSettings(settingsObject) {
   /*
+    Evaluates contents from the popup's data fields for validity
     settingsObject:
     {
       'startTimeString': <string>
@@ -18,7 +19,11 @@ function validSettings(settingsObject) {
 }
 
 function saveSettings() {
-  // Gets values from the start-time and end-time pickers. Writes them to storage.
+  /*
+    Gets values from the time pickers and pattern fields.
+    Updates local storage and communicates changes to the background script
+    if the values are valid
+   */
   let startTimePicker = document.getElementById('start-time-picker');
   let endTimePicker = document.getElementById('end-time-picker');
   let patternInputArray = document.getElementsByClassName('pattern-text-input');
@@ -45,10 +50,10 @@ function saveSettings() {
 
 }
 
-
 function updateUI(settingsObject) {
-  /* Takes the values from settings object and updates the respective UI
-     elements.
+  /*
+    Takes the values from settings object and updates the respective UI
+    elements.
   */
   // Time pickers
   let startTimePicker = document.getElementById('start-time-picker');
@@ -64,8 +69,9 @@ function updateUI(settingsObject) {
 }
 
 function loadSettings() {
-  /* Pulls settings from storage and updates the UI
-     Called on "boot"
+  /*
+    Pulls settings from storage and updates the UI
+    Called on popup "boot"
   */
   browser.storage.local.get("settingsObject")
     .then(results => {
@@ -73,7 +79,7 @@ function loadSettings() {
       updateUI(results.settingsObject);
     })
     .catch(error => {
-      console.error(`Encountered error retrieveing settingsObject from storage: ${error}`)
+      console.error(`Encountered error retrieving settingsObject from storage: ${error}`)
     })
 }
 
@@ -85,14 +91,17 @@ function initBtnListeners() {
 }
 
 function deletePattern(event) {
-  // onClick callback bound to a delete-button-div
-  // to delete a pattern-list-item
+  /*
+    onClick callback bound to a delete-button-div
+    to delete a pattern-list-item
+   */
   let listItemDiv = event.target.parentElement //
   listItemDiv.remove();
 }
 
 function newPattern() {
-  /* Callback bound to the new-pattern-button
+  /*
+    Callback bound to the new-pattern-button
     Adds a new pattern item to the pattern list div
     (createElement + appendChild)
   */
@@ -102,7 +111,8 @@ function newPattern() {
 }
 
 function buildPatternListItem(patternString) {
-  /* Returns Element (div: pattern-list-item)
+  /*
+    Returns Element (div: pattern-list-item)
     <div class="pattern-list-item">
       <div class="delete-button-div inline-block-div" onclick="deletePattern()">
         X
@@ -129,14 +139,6 @@ function buildPatternListItem(patternString) {
   return newListItem;
 }
 
-
-// On initial run we want to pull the settings saved in local storage and populate
-// the settings page appropriately.
-
-
-// Load stored settings, if any
-
-// Install button listeners
 
 console.log('Loading settings')
 loadSettings();

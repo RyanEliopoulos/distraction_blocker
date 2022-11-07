@@ -1,9 +1,33 @@
 @TODO Have the time picker text color change to red with invalid time selection.
-@TODO Add in the time bounding functionality
+@TODO time rationing
+@TODO Selective enforcement by day
+@TODO Transmit patterns to the filter script on boot/install rather than just on "save changes"
+I think the above is done, though won't know until it is signed and installed after rebooting firefox.
 
 
 
+11/7/2022
+    Updated to redirect the offending tab to the extension page rather than close and open in a new tab.  The redirect
+    will replace the offending page in the tab history the 'back' functionality will not simply re-trigger the filter.
 
+
+10/8/2022
+
+    "GLOBAL" variables: Lack of import/export support by mozilla is annoying. There are apparently packaging tools
+                  that can rebundle the files to add that sort of functionality. Not clear to me at this time though.
+                  Another possible thing to do: use "window" on pages as a global variable store. Properties of window
+                  are global variables, and we can add properties to window. But this would apply to content scripts o
+                  only I think (maybe if we run the background page it would be fine..yes. Also extension pages would
+                  be fine too I think).
+
+
+    OMG: I can use functions across background script files without the need for import statements!!!
+         This does not seem to be a javascript thing. Weird. But great.
+         Ok, the background scripts are all loaded into the same backgroun page and share the same window global
+         context. They are loaded in the order that they appear. More[https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/background]
+
+         This is like (or is idk) injecting script tags into a page. Subsequent scripts can access functions from
+         previous script tags.
 
 10/7/2022
     Firefox does not allow importing in javascript files (unless the background script is a "page").
@@ -45,6 +69,11 @@
 
     SOLVED: webNavigation callback has details.frameId. 0 means it's top level, >0 means it is embedded. So
             ignoring embedded frames solved the problem.
+
+
+    Loop Prevention (on extension page):
+        1) Now PROPERLY ignoring filter if the URL starts with "moz-extension"
+        2) Can B64 encode (encodeURIComponent/decode..) the URL string before loading the extension page.
 
 10/6/2022
 
