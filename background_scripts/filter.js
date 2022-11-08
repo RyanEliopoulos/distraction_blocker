@@ -123,12 +123,15 @@ function handleStartup() {
         console.log('No stored settingsObject')
         return;
       }
+      console.log('Got a settingsObject')
+      console.log(results)
       console.log('loading values from settingsObject')
       // browser.runtime.sendMessage({type: 'settings_update', patternStringArray: results.patternStringArray})
       let message = {
         type: 'settings_update',
-        patternStringArray: results.patternStringArray
+        patternStringArray: results.settingsObject.patternStringArray
       }
+      console.log(message)
       onUpdate(message, null, null)
     })
     .catch(error => {

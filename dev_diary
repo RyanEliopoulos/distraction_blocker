@@ -12,6 +12,18 @@ I think the above is done, though won't know until it is signed and installed af
     any listeners established yet. Replaced that with a direct call to onUpdate instead.
 
 
+    Permanently install unsigned addon:
+    1) Must use Firefox developer edition.
+    2) about:config and turn xpinstall.signatures.required to false
+    3) update manifest to include
+             "browser_specific_settings": {
+                "gecko": {
+                  "id": "test@gmail.com"
+                }
+              }
+    4) about:addons - install add on from file (all zipped together).
+
+
 11/7/2022
     Updated to redirect the offending tab to the extension page rather than close and open in a new tab.  The redirect
     will replace the offending page in the tab history the 'back' functionality will not simply re-trigger the filter.
