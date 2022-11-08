@@ -5,6 +5,12 @@
 I think the above is done, though won't know until it is signed and installed after rebooting firefox.
 
 
+11/8/2022
+    Updated the hourglass icon to have a transparent background.
+
+    Hopeful bugfix with the onStartup call. The callback triggers, calling runtime.sendMessage but there aren't
+    any listeners established yet. Replaced that with a direct call to onUpdate instead.
+
 
 11/7/2022
     Updated to redirect the offending tab to the extension page rather than close and open in a new tab.  The redirect

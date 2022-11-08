@@ -88,7 +88,8 @@ function filterListener(details) {
 
 function onUpdate(message, sender, sendResponse) {
   // one-way communication from the popup when the user clicks
-  // the 'Save Changes' button or from onStartup
+  // the 'Save Changes' button. Manually called from handleStartup
+  // for initialization.
   console.log('in onUpdate')
   if(message.type !== "settings_update") return;
   // Adjusting webNavigation filter
@@ -123,7 +124,12 @@ function handleStartup() {
         return;
       }
       console.log('loading values from settingsObject')
-      browser.runtime.sendMessage({type: 'settings_update', patternStringArray: results.patternStringArray})
+      // browser.runtime.sendMessage({type: 'settings_update', patternStringArray: results.patternStringArray})
+      let message = {
+        type: 'settings_update',
+        patternStringArray: results.patternStringArray
+      }
+      onUpdate(message, null, null)
     })
     .catch(error => {
       console.error(`Error retrieving settingsObject in handleStartup: ${error}`)
@@ -131,7 +137,9 @@ function handleStartup() {
 }
 
 function main() {
+  console.log('In main of background script')
   if(!browser.runtime.onStartup.hasListener(handleStartup)) {
+    console.log('Background script does not have onStartup listener. Fixing')
     browser.runtime.onStartup.addListener(handleStartup)
   }
   registerMsgListener()
