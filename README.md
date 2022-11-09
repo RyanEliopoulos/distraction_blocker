@@ -6,5 +6,12 @@ your present self knows best.
 ![Distraction Redirect Page](readme_imgs/override.png)
 
 ### Specifying Websites
-Target websites are specified using a list of regular expressions. The given example the filter will trigger if 
-'twitter' appears in the URL before the query string. This prevents the filter from triggering 
+Target websites are specified using a list of regular expressions. The given example filter will trigger if 
+'twitter' appears in the URL before the query string. This prevents the filter from triggering when you Google search 
+"Why did Elon buy twitter?"
+
+![Example settings](readme_imgs/browser_action.png)
+
+
+### Activation Window
+The filter will only trigger between the start and end times.
