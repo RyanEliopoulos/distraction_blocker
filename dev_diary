@@ -1,8 +1,14 @@
 @TODO Have the time picker text color change to red with invalid time selection.
-@TODO time rationing
+@TODO time rationing/tracking
 @TODO Selective enforcement by day
-@TODO Transmit patterns to the filter script on boot/install rather than just on "save changes"
-I think the above is done, though won't know until it is signed and installed after rebooting firefox.
+
+
+11/9/2022
+
+    Updated design. No longer any communication between the popup and the backgroudn script.
+    Background script reads the regex patterns from disk on every navigation event and checks the URL against them.
+    Removing the webNavigation from nested asynchronous calls causes the background script to reload if it has been
+    terminated for being idle. The design issue has been resolved. Full functionality in place.
 
 
 11/8/2022
@@ -22,6 +28,20 @@ I think the above is done, though won't know until it is signed and installed af
                 }
               }
     4) about:addons - install add on from file (all zipped together).
+
+
+
+    PROBLEM with design. The filter stops working when the background script goes to sleep. So even though the filter
+    is now loading properly after firefox boots the functionality ceases after awhile.
+
+    Mozilla docs require callbacks to be at the top level of the script in order to restart the background script once
+    it has been stopped. Embedding it in asynchronous calls is a dead end design. Must rethink
+    Careful with attaching multiple listeners though. (re) Attaching a listener at the top level of the script,
+    upon reload because of the filter getting a hit, without checking if webNavigation.onCommitted already had caused
+    the redirect to not work. Unclear why.
+
+    Need a different way of loading the data off disk then, since the filter functions follow the asynchronous storage
+    reads.
 
 
 11/7/2022

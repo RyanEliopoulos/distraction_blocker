@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "Distraction_Blocker",
-  "version": "1.001",
+  "version": "1.0.0.1",
   "description": "Blocks access to URLs with user-provided REGEX patterns",
   "icons": {
     "48": "icons/hourglass_transparent.png"
@@ -23,5 +23,11 @@
   "background": {
     "scripts": ["background_scripts/filter.js"],
     "persistent": false
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "test@gmail.com"
+    }
   }
 }

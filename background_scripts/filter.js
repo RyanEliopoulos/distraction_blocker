@@ -36,12 +36,19 @@ async function filterActive() {
   }
 }
 
-function filterListener(details) {
-  // Executes when the webNavigation.onCommitted event fires with
-  // a URL matching those registered during the onUpdate call.
-  // Embedded frames originating from a filtered URL are ignored.
-  // Calls occurring outside of the specified activation times are ignored.
+function deleteFromLocalStorage(key) {
+  console.log(`Deleting ${key} from local storage`)
+  browser.storage.local.remove(key)
+    .catch(error => {
+      console.error(`Error deleting from local storage: ${error}`)
+    })
+}
 
+async function navigateCallback(details) {
+  // Registered on webNavigation event.
+  // Determines fate of each web navigation by evaluating each URL against the stored regular expressions.
+  // Ignores embedded content originating from a URL matching one of the patterns.
+  console.log('in navigateCallback')
   if(details.frameId > 0) {
     // This is an embedded frame. Ignoring.
     return;
@@ -52,101 +59,52 @@ function filterListener(details) {
     console.log('extension page detected')
     return;
   }
-
-  filterActive()
-    .then(isActive => {
-      if(!isActive) return;
+  let isActive = await filterActive()
+  if(!isActive) {
+    console.log('Filter is not currently active. Allowing all traffic')
+    return
+  }
+  // pulling patterns and evaluating against the URL
+  let storedData = await browser.storage.local.get('settingsObject').catch(error => {console.error(error)})
+  if(Object.keys(storedData).length === 0) {
+    console.log('no settingsObject in local storage')
+    return
+  }
+  let patternStringArray = storedData.settingsObject.patternStringArray
+  patternStringArray.forEach(pattern => {
+    let regex = new RegExp(pattern)
+    if(regex.test(details.url)) {
+      console.log(`Regex match for pattern ${pattern}`)
       browser.storage.local.get('exemption')
-        .then(results => {
-          console.log('install script session storage get')
-          console.log(results)
-          let exemptTabId = results?.exemption?.tabId
-          let exemptionFulfilled = results?.exemption?.fulfilled
-          if (exemptTabId === details.tabId && exemptionFulfilled === false) {
-            // Exempt
-            console.log('removing exemption')
-            browser.storage.local.remove('exemption')
-              .catch(error => {
-                console.error(`Error removing exemption from storage: ${error}`)
-              });
+        .then(result => {
+          console.log('Checking for exemptions')
+          let exemptTabId = result?.exemption?.tabId
+          if(exemptTabId === details.tabId) {
+            // Tab is authorized for a manual override
+            console.log('Exemption found.')
+            deleteFromLocalStorage('exemption')
           }
           else {
-            // Not exempt. Redirecting.
+            // Tab not authorized for manual override. Redirecting to block page.
+            console.log('No exemption found. Redirecting')
             let updateProperties = {
               url: `../extension_page/extension_page.html?url=${details.url}`,
               loadReplace: true  // So the back button doesn't just trigger the filter again.
             }
             browser.tabs.update(details.tabId, updateProperties)
-            console.log('Triggered a targeted URL filter')
           }
         })
         .catch(error => {
-          console.error(`Error loading exemption from local storage: ${error}`)
+          console.error(`Error loading exemption from disk: ${error}`)
         })
-    })
-}
-
-function onUpdate(message, sender, sendResponse) {
-  // one-way communication from the popup when the user clicks
-  // the 'Save Changes' button. Manually called from handleStartup
-  // for initialization.
-  console.log('in onUpdate')
-  if(message.type !== "settings_update") return;
-  // Adjusting webNavigation filter
-  console.log('removing old filter')
-  if(browser.webNavigation.onCommitted.hasListener(filterListener)) {
-    browser.webNavigation.onCommitted.removeListener(filterListener);
-  }
-  console.log('creating filter array')
-  let urlFilterArray = message.patternStringArray.map(patternString => (
-    {urlMatches: patternString}
-  ))
-  let filter = { url: urlFilterArray}
-  console.log(filter)
-  browser.webNavigation.onCommitted.addListener(filterListener, filter);
-  console.log('Filters updated')
-}
-
-function registerMsgListener() {
-  // Registers the callback listening for communication from the popup.
-  if(browser.runtime.onMessage.hasListener(onUpdate)) return
-  browser.runtime.onMessage.addListener(onUpdate);
-}
-
-function handleStartup() {
-  // Reads any filter patterns from persistent memory and register
-  // them with the filter.
-  console.log('Inside handleStartup')
-  browser.storage.local.get('settingsObject')
-    .then(results => {
-      if(Object.keys(results).length === 0) {
-        console.log('No stored settingsObject')
-        return;
-      }
-      console.log('Got a settingsObject')
-      console.log(results)
-      console.log('loading values from settingsObject')
-      // browser.runtime.sendMessage({type: 'settings_update', patternStringArray: results.patternStringArray})
-      let message = {
-        type: 'settings_update',
-        patternStringArray: results.settingsObject.patternStringArray
-      }
-      console.log(message)
-      onUpdate(message, null, null)
-    })
-    .catch(error => {
-      console.error(`Error retrieving settingsObject in handleStartup: ${error}`)
-    })
+    }
+  })
 }
 
 function main() {
-  console.log('In main of background script')
-  if(!browser.runtime.onStartup.hasListener(handleStartup)) {
-    console.log('Background script does not have onStartup listener. Fixing')
-    browser.runtime.onStartup.addListener(handleStartup)
+    if(!browser.webNavigation.onBeforeNavigate.hasListener(navigateCallback)) {
+      browser.webNavigation.onCommitted.addListener(navigateCallback);
   }
-  registerMsgListener()
 }
 
 main()
-

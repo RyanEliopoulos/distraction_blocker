@@ -40,14 +40,11 @@ function saveSettings() {
   // Saving to disk
   browser.storage.local.set({settingsObject: settingsObject})
     .then(()=> {
-      console.log('successfully saved settings. Calling registration background script')
-      // Alerting the background filter script to update
-       browser.runtime.sendMessage({type: "settings_update", patternStringArray: patternStringArray})
+      console.log('successfully saved settings.')
     })
     .catch(error => {
       console.error(`Error writing settings to disk: ${error}`)
     })
-
 }
 
 function updateUI(settingsObject) {

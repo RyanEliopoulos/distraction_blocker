@@ -20,7 +20,7 @@ let ob = document.getElementById('override-button')
 ob.onclick = ()=>{
   browser.tabs.getCurrent()
     .then(tab => {
-      let exemptionObj = {tabId: tab.id, fulfilled: false}
+      let exemptionObj = {tabId: tab.id}
       browser.storage.local.set({'exemption': exemptionObj})
         .then(()=> {
           console.log('session write success. Opening taboo page');
