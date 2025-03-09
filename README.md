@@ -17,3 +17,8 @@ Target websites are specified using a list of regular expressions. The given exa
 
 ### Activation Window
 The filter will only trigger between the start and end times.
+
+
+### Known Bugs
+An invalid/incorrectly formatted regular expression will throw an unhandled exception and premature termination of the filter logic.
+The extension loops through the list in order, meaning all subsequent regular expressions lower on the list are not evaluated.
